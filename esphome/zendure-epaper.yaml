@@ -53,6 +53,10 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+  # Many ESP32-C3 boards (e.g. SuperMini) have trouble associating at full
+  # TX power; lowering it and disabling power save makes the link reliable.
+  output_power: 8.5dB
+  power_save_mode: none
   ap:
     ssid: "${name} Fallback"
     password: !secret ap_password

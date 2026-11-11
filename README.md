@@ -18,25 +18,33 @@ ESP32-powered e-paper dashboard displaying real-time solar production, home ener
 
 ## Display
 
+200 × 200 px, refreshed every 5 minutes:
+
 ```
 ┌────────────────────────┐
-│ SolarFlow         14:32│
+│ SolarFlow        19:09 │
 ├───────────┬────────────┤
-│PRODUCTION │   HOME     │
-│   1850    │    620     │
+│ PRODUCTION│    HOME    │
+│    1850   │    620     │
 │     W     │     W      │
-├───────────┴────────────┤
-│  M1  │  M2  │ M3 │ M4  │
-│ 480  │ 470  │ 460│ 440 │
-├────────────────────────┤
+├─────┬─────┼─────┬──────┤
+│  M1 │  M2 │  M3 │  M4  │
+│ 480 │ 470 │ 460 │ 440  │
+├─────┴─────┴─────┴──────┤
 │ BATTERY                │
-│ 85%             +1230 W│
-│ [██████████████░░░]    │
+│ 85%            +1230 W │
+│ [█████████████████░░░] │
 ├────────────────────────┤
-│ SOLAR COVERAGE     72% │
-│ [███████████░░░░░]     │
+│ SOLAR COVERAGE    100% │
+│ [████████████████████] │
 └────────────────────────┘
 ```
+
+- **PRODUCTION / HOME**: total solar power and home consumption, in W.
+- **M1–M4**: power of each of the four MPPT inputs, in W.
+- **BATTERY**: level (%), power (W, positive when charging) and level bar.
+- **SOLAR COVERAGE**: share of the home consumption supplied by the SolarFlow.
+  Values show `--` while Home Assistant data is not available.
 
 ## Quick start
 

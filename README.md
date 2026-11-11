@@ -29,7 +29,7 @@ ESP32-powered e-paper dashboard displaying real-time solar production, home ener
 │ 85%             +1230 W│
 │ [██████████████░░░]    │
 ├────────────────────────┤
-│ SELF-CONSUMPTION   72% │
+│ SOLAR COVERAGE     72% │
 │ [███████████░░░░░]     │
 └────────────────────────┘
 ```

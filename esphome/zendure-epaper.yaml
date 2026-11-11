@@ -13,19 +13,20 @@ substitutions:
   # The names below are examples: check them in
   # Developer tools > States.
   solar_entity: sensor.solarflow_2400_pro_solar_input_power
-  mppt1_entity: sensor.solarflow_2400_pro_solar_power_1
-  mppt2_entity: sensor.solarflow_2400_pro_solar_power_2
-  mppt3_entity: sensor.solarflow_2400_pro_solar_power_3
-  mppt4_entity: sensor.solarflow_2400_pro_solar_power_4
-  home_entity: sensor.maison_puissance_consommee          # home consumption (W)
+  mppt1_entity: sensor.solarflow_2400_pro_solar_power1
+  mppt2_entity: sensor.solarflow_2400_pro_solar_power2
+  mppt3_entity: sensor.solarflow_2400_pro_solar_power3
+  mppt4_entity: sensor.solarflow_2400_pro_solar_power4
+  # Power the SolarFlow delivers to the house (W); home = grid import + this
+  sf_output_entity: sensor.solarflow_2400_pro_output_home_power
   battery_soc_entity: sensor.solarflow_2400_pro_electric_level  # battery level (%)
-  battery_power_entity: sensor.solarflow_2400_pro_battery_power # battery power (W)
-  grid_entity: sensor.reseau_puissance                    # grid power (W)
+  battery_power_entity: sensor.solarflow_2400_pro_bat_in_out # battery power (W)
+  grid_entity: sensor.lixee_zlinky_tic_papp               # Linky apparent power (VA), import only
 
   # Sign conventions (set to -1 to invert)
   # battery_power_sign: 1 => positive = charging, negative = discharging
   # grid_power_sign:    1 => positive = import, negative = export
-  battery_power_sign: "1"
+  battery_power_sign: "-1"
   grid_power_sign: "1"
 
   # Display refresh period
@@ -68,6 +69,8 @@ time:
     id: ha_time
     on_time_sync:
       then:
+        # wait for the first values from Home Assistant before drawing
+        - delay: 30s
         - component.update: epaper
 
 # --- Data ------------------------------------------------------------------
@@ -88,8 +91,12 @@ sensor:
     id: mppt4
     entity_id: ${mppt4_entity}
   - platform: homeassistant
-    id: home_power
-    entity_id: ${home_entity}
+    id: sf_output_power
+    entity_id: ${sf_output_entity}
+    on_value:
+      then:
+        - component.update: home_power
+        - component.update: solar_coverage
   - platform: homeassistant
     id: battery_soc
     entity_id: ${battery_soc_entity}
@@ -99,20 +106,36 @@ sensor:
   - platform: homeassistant
     id: grid_power
     entity_id: ${grid_entity}
+    on_value:
+      then:
+        - component.update: home_power
 
-  # Self-consumption rate = share of production not exported to the grid
+  # Home consumption = grid import (Linky) + power delivered by the SolarFlow
   - platform: template
-    id: self_consumption
-    name: "Self-consumption"
+    id: home_power
+    name: "Home power"
+    unit_of_measurement: "W"
+    accuracy_decimals: 0
+    update_interval: never
+    lambda: |-
+      float grid = id(grid_power).state * ${grid_power_sign};
+      float sf = id(sf_output_power).state;
+      if (isnan(grid) || isnan(sf)) return NAN;
+      return (grid > 0 ? grid : 0) + sf;
+
+  # Solar coverage = share of the home consumption supplied by the SolarFlow
+  # (solar production, directly or through the battery)
+  - platform: template
+    id: solar_coverage
+    name: "Solar coverage"
     unit_of_measurement: "%"
     accuracy_decimals: 0
-    update_interval: 60s
+    update_interval: never
     lambda: |-
-      float solar = id(solar_power).state;
-      float grid = id(grid_power).state;
-      if (isnan(solar) || isnan(grid) || solar < 10) return NAN;
-      float export_w = (grid * ${grid_power_sign}) < 0 ? -(grid * ${grid_power_sign}) : 0;
-      float v = (solar - export_w) / solar * 100.0f;
+      float home = id(home_power).state;
+      float sf = id(sf_output_power).state;
+      if (isnan(home) || isnan(sf) || home < 1) return NAN;
+      float v = sf / home * 100.0f;
       if (v < 0) v = 0;
       if (v > 100) v = 100;
       return v;
@@ -147,7 +170,7 @@ display:
     dc_pin: GPIO10
     reset_pin: GPIO3
     busy_pin: GPIO5
-    full_update_every: 6
+    full_update_every: 1
     update_interval: ${refresh_interval}
     rotation: 0
     lambda: |-
@@ -194,9 +217,9 @@ display:
       if (!isnan(soc)) it.filled_rectangle(2, 156, (int) (196 * soc / 100.0f), 10);
       it.line(0, 170, 199, 170);
 
-      // Self-consumption
-      float sc = id(self_consumption).state;
-      it.print(2, 173, id(font_small), "SELF-CONSUMPTION");
+      // Solar coverage
+      float sc = id(solar_coverage).state;
+      it.print(2, 173, id(font_small), "SOLAR COVERAGE");
       it.printf(198, 172, id(font_medium), TextAlign::TOP_RIGHT, "%s%%", fmt(sc, "%.0f").c_str());
       it.rectangle(2, 189, 196, 9);
       if (!isnan(sc)) it.filled_rectangle(2, 189, (int) (196 * sc / 100.0f), 9);

@@ -69,7 +69,7 @@ See [wiring](docs/wiring.md) for the pin connections.
 
 - Home Assistant with a Zendure integration exposing the SolarFlow sensors
   (for example [Zendure-HA](https://github.com/Zendure/Zendure-HA))
-- A grid power sensor (for example a Linky through ZLinky)
+- A grid power sensor from your smart meter (in W)
 - [ESPHome](https://esphome.io) 2026.10 or newer
 - The hardware listed above
 
@@ -85,6 +85,22 @@ esphome run zendure-epaper.yaml
 
 Then add the `zendure-epaper` device in Home Assistant (*Settings > Devices &
 services*) with the API key from `secrets.yaml`.
+
+### Keeping your own entity names
+
+Rather than editing the main file, create a git-ignored `esphome/local.yaml`
+that overrides the defaults:
+
+```yaml
+substitutions:
+  grid_entity: sensor.my_meter_power
+  mppt1_entity: sensor.my_solarflow_solar_power1
+
+packages:
+  epaper: !include zendure-epaper.yaml
+```
+
+Then run `esphome run local.yaml`.
 
 ## Documentation
 

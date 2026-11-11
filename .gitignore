@@ -1,6 +1,8 @@
 esphome/secrets.yaml
 esphome/.esphome/
+esphome/local.yaml
 .esphome/
 *.bin
 __pycache__/
 .DS_Store
+esphome/.gitignore

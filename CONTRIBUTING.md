@@ -25,5 +25,6 @@ tokens. Redact them from logs before posting.
 4. Update the README, `docs/` and `CHANGELOG.md` if behavior changes.
 5. Open a pull request describing what and why.
 
-Entity names in `zendure-epaper.yaml` default to the author's setup. Adjust
-them through the `substitutions` block rather than hard-coding new ones.
+Entity names in `zendure-epaper.yaml` default to a SolarFlow 2400 Pro with the
+Zendure-HA integration. Adjust them through the `substitutions` block rather
+than hard-coding new ones.

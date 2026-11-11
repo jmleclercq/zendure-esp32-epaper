@@ -10,8 +10,9 @@ substitutions:
   friendly_name: Zendure e-Paper
 
   # --- Home Assistant entities (adapt to your installation) ------------------
-  # The defaults match a SolarFlow 2400 Pro (Zendure-HA integration) and a
-  # Linky meter (ZLinky): check them in Developer tools > States and adapt.
+  # The defaults match a SolarFlow 2400 Pro (Zendure-HA integration). Check
+  # them in Developer tools > States and set your own grid power sensor.
+  # Tip: keep your own values in esphome/local.yaml (git-ignored), see README.
   solar_entity: sensor.solarflow_2400_pro_solar_input_power
   mppt1_entity: sensor.solarflow_2400_pro_solar_power1
   mppt2_entity: sensor.solarflow_2400_pro_solar_power2
@@ -21,7 +22,7 @@ substitutions:
   sf_output_entity: sensor.solarflow_2400_pro_output_home_power
   battery_soc_entity: sensor.solarflow_2400_pro_electric_level  # battery level (%)
   battery_power_entity: sensor.solarflow_2400_pro_bat_in_out # battery power (W)
-  grid_entity: sensor.lixee_zlinky_tic_papp               # Linky apparent power (VA), import only
+  grid_entity: sensor.grid_power                          # grid import power (W), set yours
 
   # Sign conventions (set to -1 to invert)
   # battery_power_sign: 1 => positive = charging, negative = discharging
@@ -109,7 +110,7 @@ sensor:
       then:
         - component.update: home_power
 
-  # Home consumption = grid import (Linky) + power delivered by the SolarFlow
+  # Home consumption = grid import + power delivered by the SolarFlow
   - platform: template
     id: home_power
     name: "Home power"

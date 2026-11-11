@@ -33,8 +33,8 @@ refresh on every update (`full_update_every: 1`) to avoid ghosting.
 ## `-0 W` or wrong sign for the battery
 
 Set `battery_power_sign` to `"1"` or `"-1"` in the `substitutions` block until
-the sign is positive while charging. For the Zendure integration used by the
-author, `bat_in_out` is negative while charging, hence `"-1"`.
+the sign is positive while charging. With the Zendure-HA integration, `bat_in_out` is negative while charging,
+hence the default `"-1"`.
 
 ## Solar coverage looks wrong
 

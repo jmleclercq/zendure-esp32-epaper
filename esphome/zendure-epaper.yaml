@@ -96,7 +96,6 @@ sensor:
     on_value:
       then:
         - component.update: home_power
-        - component.update: solar_coverage
   - platform: homeassistant
     id: battery_soc
     entity_id: ${battery_soc_entity}
@@ -117,6 +116,9 @@ sensor:
     unit_of_measurement: "W"
     accuracy_decimals: 0
     update_interval: never
+    on_value:
+      then:
+        - component.update: solar_coverage
     lambda: |-
       float grid = id(grid_power).state * ${grid_power_sign};
       float sf = id(sf_output_power).state;
@@ -210,6 +212,7 @@ display:
       // Battery
       float soc = id(battery_soc).state;
       float bp = id(battery_power).state * ${battery_power_sign};
+      if (bp == 0) bp = 0;  // avoid printing "-0"
       it.print(2, 123, id(font_small), "BATTERY");
       it.printf(2, 136, id(font_medium), "%s%%", fmt(soc, "%.0f").c_str());
       it.printf(198, 136, id(font_medium), TextAlign::TOP_RIGHT, "%s W", fmt(bp, "%+.0f").c_str());

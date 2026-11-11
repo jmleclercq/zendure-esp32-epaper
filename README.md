@@ -2,6 +2,10 @@
 
 ESP32-powered e-paper dashboard displaying real-time solar production, home energy consumption, battery status, and self-consumption data from Zendure SolarFlow via Home Assistant and ESPHome.
 
+## Prototype
+
+![Prototype: ESP32-C3 on a breadboard wired to the Waveshare 1.54" e-Paper, showing the dashboard](docs/prototype.jpg)
+
 ## Hardware
 
 | Item            | Choice                                          |

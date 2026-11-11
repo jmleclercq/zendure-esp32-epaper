@@ -1,0 +1,31 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens?
+      description: What you expected and what you get (a photo of the display helps).
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware
+      description: ESP32 board and display model
+      placeholder: ESP32-C3 SuperMini + Waveshare 1.54" V2
+    validations:
+      required: true
+  - type: input
+    id: esphome
+    attributes:
+      label: ESPHome version
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Output of `esphome logs`. Remove any secret (passwords, keys, tokens) first.
+      render: text

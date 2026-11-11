@@ -10,8 +10,8 @@ substitutions:
   friendly_name: Zendure e-Paper
 
   # --- Home Assistant entities (adapt to your installation) ------------------
-  # The names below are examples: check them in
-  # Developer tools > States.
+  # The defaults match a SolarFlow 2400 Pro (Zendure-HA integration) and a
+  # Linky meter (ZLinky): check them in Developer tools > States and adapt.
   solar_entity: sensor.solarflow_2400_pro_solar_input_power
   mppt1_entity: sensor.solarflow_2400_pro_solar_power1
   mppt2_entity: sensor.solarflow_2400_pro_solar_power2

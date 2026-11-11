@@ -1,34 +1,34 @@
-# Tableau de bord e-paper Zendure SolarFlow 2400 Pro
+# Zendure SolarFlow 2400 Pro e-paper dashboard
 # ESP32-C3 + Waveshare e-Paper 1,54" V2 (200x200) + Home Assistant
 #
-# 1. Copier secrets.example.yaml en secrets.yaml et le remplir
-# 2. Adapter les entités Home Assistant dans le bloc "substitutions"
+# 1. Copy secrets.example.yaml to secrets.yaml and fill it in
+# 2. Adapt the Home Assistant entities in the "substitutions" block
 # 3. esphome run zendure-epaper.yaml
 
 substitutions:
   name: zendure-epaper
   friendly_name: Zendure e-Paper
 
-  # --- Entités Home Assistant (à adapter à votre installation) ---------------
-  # Les noms ci-dessous sont des exemples : vérifiez-les dans
-  # Outils de développement > États.
+  # --- Home Assistant entities (adapt to your installation) ------------------
+  # The names below are examples: check them in
+  # Developer tools > States.
   solar_entity: sensor.solarflow_2400_pro_solar_input_power
   mppt1_entity: sensor.solarflow_2400_pro_solar_power_1
   mppt2_entity: sensor.solarflow_2400_pro_solar_power_2
   mppt3_entity: sensor.solarflow_2400_pro_solar_power_3
   mppt4_entity: sensor.solarflow_2400_pro_solar_power_4
-  home_entity: sensor.maison_puissance_consommee          # consommation maison (W)
-  battery_soc_entity: sensor.solarflow_2400_pro_electric_level  # niveau batterie (%)
-  battery_power_entity: sensor.solarflow_2400_pro_battery_power # puissance batterie (W)
-  grid_entity: sensor.reseau_puissance                    # puissance réseau (W)
+  home_entity: sensor.maison_puissance_consommee          # home consumption (W)
+  battery_soc_entity: sensor.solarflow_2400_pro_electric_level  # battery level (%)
+  battery_power_entity: sensor.solarflow_2400_pro_battery_power # battery power (W)
+  grid_entity: sensor.reseau_puissance                    # grid power (W)
 
-  # Conventions de signe (mettre -1 pour inverser)
-  # battery_power_sign : 1 => valeur positive = charge, négative = décharge
-  # grid_power_sign    : 1 => valeur positive = soutirage, négative = injection
+  # Sign conventions (set to -1 to invert)
+  # battery_power_sign: 1 => positive = charging, negative = discharging
+  # grid_power_sign:    1 => positive = import, negative = export
   battery_power_sign: "1"
   grid_power_sign: "1"
 
-  # Période de rafraîchissement de l'écran
+  # Display refresh period
   refresh_interval: 5min
 
 esphome:
@@ -66,7 +66,7 @@ time:
       then:
         - component.update: epaper
 
-# --- Données ------------------------------------------------------------------
+# --- Data ------------------------------------------------------------------
 sensor:
   - platform: homeassistant
     id: solar_power
@@ -96,10 +96,10 @@ sensor:
     id: grid_power
     entity_id: ${grid_entity}
 
-  # Taux d'autoconsommation = part de la production qui n'est pas injectée
+  # Self-consumption rate = share of production not exported to the grid
   - platform: template
     id: self_consumption
-    name: "Autoconsommation"
+    name: "Self-consumption"
     unit_of_measurement: "%"
     accuracy_decimals: 0
     update_interval: 60s
@@ -115,11 +115,11 @@ sensor:
 
 button:
   - platform: template
-    name: "Rafraîchir l'écran"
+    name: "Refresh display"
     on_press:
       - component.update: epaper
 
-# --- Écran --------------------------------------------------------------------
+# --- Display --------------------------------------------------------------------
 font:
   - file: "gfonts://Roboto"
     id: font_small
@@ -154,22 +154,22 @@ display:
         return std::string(b);
       };
 
-      // En-tête
+      // Header
       it.print(2, 0, id(font_medium), "SolarFlow");
       it.strftime(198, 0, id(font_medium), TextAlign::TOP_RIGHT, "%H:%M", id(ha_time).now());
       it.line(0, 19, 199, 19);
 
-      // Production / Consommation
+      // Production / Home consumption
       it.print(50, 22, id(font_small), TextAlign::TOP_CENTER, "PRODUCTION");
       it.printf(50, 36, id(font_big), TextAlign::TOP_CENTER, "%s", fmt(id(solar_power).state, "%.0f").c_str());
       it.print(50, 66, id(font_small), TextAlign::TOP_CENTER, "W");
-      it.print(150, 22, id(font_small), TextAlign::TOP_CENTER, "MAISON");
+      it.print(150, 22, id(font_small), TextAlign::TOP_CENTER, "HOME");
       it.printf(150, 36, id(font_big), TextAlign::TOP_CENTER, "%s", fmt(id(home_power).state, "%.0f").c_str());
       it.print(150, 66, id(font_small), TextAlign::TOP_CENTER, "W");
       it.line(100, 22, 100, 80);
       it.line(0, 82, 199, 82);
 
-      // Quatre MPPT
+      // Four MPPTs
       const char *labels[4] = {"M1", "M2", "M3", "M4"};
       float mppt[4] = {id(mppt1).state, id(mppt2).state, id(mppt3).state, id(mppt4).state};
       for (int i = 0; i < 4; i++) {
@@ -180,19 +180,19 @@ display:
       }
       it.line(0, 120, 199, 120);
 
-      // Batterie
+      // Battery
       float soc = id(battery_soc).state;
       float bp = id(battery_power).state * ${battery_power_sign};
-      it.print(2, 123, id(font_small), "BATTERIE");
+      it.print(2, 123, id(font_small), "BATTERY");
       it.printf(2, 136, id(font_medium), "%s%%", fmt(soc, "%.0f").c_str());
       it.printf(198, 136, id(font_medium), TextAlign::TOP_RIGHT, "%s W", fmt(bp, "%+.0f").c_str());
       it.rectangle(2, 156, 196, 10);
       if (!isnan(soc)) it.filled_rectangle(2, 156, (int) (196 * soc / 100.0f), 10);
       it.line(0, 170, 199, 170);
 
-      // Autoconsommation
+      // Self-consumption
       float sc = id(self_consumption).state;
-      it.print(2, 173, id(font_small), "AUTOCONSOMMATION");
+      it.print(2, 173, id(font_small), "SELF-CONSUMPTION");
       it.printf(198, 172, id(font_medium), TextAlign::TOP_RIGHT, "%s%%", fmt(sc, "%.0f").c_str());
       it.rectangle(2, 189, 196, 9);
       if (!isnan(sc)) it.filled_rectangle(2, 189, (int) (196 * sc / 100.0f), 9);

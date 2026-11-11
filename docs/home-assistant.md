@@ -1,40 +1,40 @@
-# Configuration Home Assistant
+# Home Assistant setup
 
-## Prérequis
+## Prerequisites
 
-- Home Assistant avec l'intégration Zendure (par ex. *Zendure-HA*, via HACS)
-  connectée au SolarFlow 2400 Pro.
-- Intégration **ESPHome** activée (l'appareil est découvert automatiquement
-  après le premier flash ; la clé API est celle de `secrets.yaml`).
+- Home Assistant with the Zendure integration (e.g. *Zendure-HA*, via HACS)
+  connected to the SolarFlow 2400 Pro.
+- **ESPHome** integration enabled (the device is discovered automatically
+  after the first flash; the API key is the one from `secrets.yaml`).
 
-## Entités à identifier
+## Entities to identify
 
-Dans *Outils de développement > États*, repérez les entités et reportez-les
-dans le bloc `substitutions` de `esphome/zendure-epaper.yaml` :
+In *Developer tools > States*, find your entities and copy them into the
+`substitutions` block of `esphome/zendure-epaper.yaml`:
 
-| Substitution          | Contenu                               | Unité |
-|-----------------------|---------------------------------------|-------|
-| `solar_entity`        | Puissance solaire totale              | W     |
-| `mppt1_entity` … `mppt4_entity` | Puissance de chaque MPPT    | W     |
-| `home_entity`         | Consommation de la maison             | W     |
-| `battery_soc_entity`  | Niveau de la batterie                 | %     |
-| `battery_power_entity`| Puissance de la batterie              | W     |
-| `grid_entity`         | Puissance réseau (soutirage/injection)| W     |
+| Substitution                    | Content                            | Unit |
+|---------------------------------|------------------------------------|------|
+| `solar_entity`                  | Total solar power                  | W    |
+| `mppt1_entity` … `mppt4_entity` | Power of each MPPT                 | W    |
+| `home_entity`                   | Home consumption                   | W    |
+| `battery_soc_entity`            | Battery level                      | %    |
+| `battery_power_entity`          | Battery power                      | W    |
+| `grid_entity`                   | Grid power (import/export)         | W    |
 
-Les noms par défaut sont des **exemples** : ils dépendent de la version de
-l'intégration et du nom donné à l'appareil.
+The default names are **examples**: they depend on the integration version and
+on the name given to the device.
 
-## Signes
+## Signs
 
-- `battery_power_sign` : mettre `"-1"` si votre entité est négative en charge.
-- `grid_power_sign` : mettre `"-1"` si votre entité est négative en soutirage.
+- `battery_power_sign`: set to `"-1"` if your entity is negative when charging.
+- `grid_power_sign`: set to `"-1"` if your entity is negative when importing.
 
-## Taux d'autoconsommation
+## Self-consumption rate
 
-Calculé dans l'ESPHome :
+Computed in ESPHome:
 
 ```
-autoconsommation = (production − injection réseau) / production × 100
+self-consumption = (production − grid export) / production × 100
 ```
 
-Il est affiché `--` quand la production est inférieure à 10 W.
+It shows `--` when production is below 10 W.

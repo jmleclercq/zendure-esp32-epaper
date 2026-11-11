@@ -14,9 +14,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install esphome
-      - name: Préparer secrets.yaml factice
+      - name: Prepare dummy secrets.yaml
         working-directory: esphome
         run: cp secrets.example.yaml secrets.yaml
-      - name: Compiler
+      - name: Compile
         working-directory: esphome
         run: esphome compile zendure-epaper.yaml
